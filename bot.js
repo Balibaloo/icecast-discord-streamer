@@ -4,6 +4,7 @@ require('dotenv').config()
 const http = require("http")
 const fs = require('fs')
 
+
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
