@@ -1,0 +1,27 @@
+{
+  "name": "discord-radio-stream",
+  "version": "1.0.0",
+  "description": "discord bot to listen to radio streams (mp3/ogg)",
+  "main": "bot.js",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "env": "^0.0.2",
+    "ffmpeg": "0.0.4",
+    "http": "0.0.1-security"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Balibaloo/discord-radio-stream.git"
+  },
+  "author": "Balibaloo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Balibaloo/discord-radio-stream/issues"
+  },
+  "homepage": "https://github.com/Balibaloo/discord-radio-stream#readme"
+}
