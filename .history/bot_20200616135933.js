@@ -145,5 +145,3 @@ let handleCommand = async (message) => {
 
 // login
 client.login(process.env.botToken);
-
-//

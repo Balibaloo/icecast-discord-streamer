@@ -12,56 +12,23 @@ client.on('ready', () => {
 
 });
 
-client.on("error", (error) => {
-    console.log(error)
-})
-
 let requestTimeout = null;
-let connection = null;
-
-let connectionNumber = 0
-let isConnected = false
-
-let globalLog = (discordMessage, textMessage) => {
-    discordMessage.channel.send(textMessage)
-    console.log(textMessage)
-}
 
 
-let playStream = async (url,message) => {
+let playStream = (connection,url,message) => {
     
-    http.get(url).on('response', async (incomingMessage) => {
+    http.get(url).on('response',(incomingMessage) => {
+        connection.play(incomingMessage)
 
-        if (incomingMessage.headers["content-type"] === "application/ogg"){
-            // counts how many times connection is sucessfull
-            connectionNumber = connectionNumber + 1;
-            isConnected = true
-            connection = await getConnection(message)
-            console.log("connection received")
-
-            if (connectionNumber == 1){
-                globalLog(message,"stream started")
-
-            } else {
-                globalLog(message,"stream resumed")
-            }
-
-            connection.play(incomingMessage)
-            clearTimeout( requestTimeout)
-        }
-        
-        
+        clearTimeout( requestTimeout)
+        message.channel.send("playing stream")
 
     }).on("close",() => {
         message.member.voice.channel.leave();
-
-        if (isConnected){
-            globalLog(message,"stream stopped")
-            isConnected = false
-        }
+        console.log("stream stopped")
 
         requestTimeout = setTimeout((message,ulr) => {
-            playStream(ulr,message)
+            tryPlayStream(message,ulr)
         },2 *1000,message,url)
         
     })
@@ -88,27 +55,31 @@ let getConnection = async (message, tryNumber = 0) => {
 }
 
 let tryPlayStream = async (message,url) => {
+
     try{
-        playStream(url,message)
+        connection = await getConnection(message)
+
+        console.log("connection received")
+
+        playStream(connection,url,message)
 
     } catch (error) {
         console.log(error)
-        globalLog(message,error.message)
+        message.channel.send(error.message)
     }
 }
 
 let disconnectStream = (message) => {
     try {
         message.member.voice.channel.leave();
-        globalLog(message,"stream stopped")
-        connectionNumber = 0
-        isConnected = false
 
     } catch(error) {
         console.log(error)
     }
 }
 
+
+message.channel.send("stream stopped")
 let messageCommandEquals = (command,mesageText) => {
     return mesageText.startsWith(prefix + " " + command)
 }
@@ -118,6 +89,7 @@ client.on('message', message => {
         handleCommand(message)
     }
 });
+
 
 let handleCommand = async (message) => {
     mesageText =  message.content
@@ -137,7 +109,7 @@ let handleCommand = async (message) => {
         }
 
     } else {
-        globalLog(message,'You need to join a voice channel first!');
+        message.channel.send('You need to join a voice channel first!');
     }        
 
 
@@ -145,5 +117,3 @@ let handleCommand = async (message) => {
 
 // login
 client.login(process.env.botToken);
-
-//

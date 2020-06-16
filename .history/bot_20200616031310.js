@@ -12,15 +12,9 @@ client.on('ready', () => {
 
 });
 
-client.on("error", (error) => {
-    console.log(error)
-})
-
 let requestTimeout = null;
 let connection = null;
-
 let connectionNumber = 0
-let isConnected = false
 
 let globalLog = (discordMessage, textMessage) => {
     discordMessage.channel.send(textMessage)
@@ -31,14 +25,15 @@ let globalLog = (discordMessage, textMessage) => {
 let playStream = async (url,message) => {
     
     http.get(url).on('response', async (incomingMessage) => {
+        console.log(incomingMessage.headers)
 
         if (incomingMessage.headers["content-type"] === "application/ogg"){
             // counts how many times connection is sucessfull
             connectionNumber = connectionNumber + 1;
-            isConnected = true
             connection = await getConnection(message)
             console.log("connection received")
 
+            console.log(connectionNumber)
             if (connectionNumber == 1){
                 globalLog(message,"stream started")
 
@@ -54,16 +49,14 @@ let playStream = async (url,message) => {
 
     }).on("close",() => {
         message.member.voice.channel.leave();
-
-        if (isConnected){
-            globalLog(message,"stream stopped")
-            isConnected = false
-        }
+        globalLog(message,"stream stopped")
 
         requestTimeout = setTimeout((message,ulr) => {
             playStream(ulr,message)
         },2 *1000,message,url)
         
+    }).on("continue", () => {
+        console.log("continue")
     })
 }
 
@@ -88,6 +81,9 @@ let getConnection = async (message, tryNumber = 0) => {
 }
 
 let tryPlayStream = async (message,url) => {
+
+    
+
     try{
         playStream(url,message)
 
@@ -102,12 +98,13 @@ let disconnectStream = (message) => {
         message.member.voice.channel.leave();
         globalLog(message,"stream stopped")
         connectionNumber = 0
-        isConnected = false
 
     } catch(error) {
         console.log(error)
     }
 }
+
+
 
 let messageCommandEquals = (command,mesageText) => {
     return mesageText.startsWith(prefix + " " + command)
@@ -118,6 +115,7 @@ client.on('message', message => {
         handleCommand(message)
     }
 });
+
 
 let handleCommand = async (message) => {
     mesageText =  message.content
@@ -145,5 +143,3 @@ let handleCommand = async (message) => {
 
 // login
 client.login(process.env.botToken);
-
-//

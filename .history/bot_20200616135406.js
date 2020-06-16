@@ -31,6 +31,7 @@ let globalLog = (discordMessage, textMessage) => {
 let playStream = async (url,message) => {
     
     http.get(url).on('response', async (incomingMessage) => {
+        console.log(incomingMessage.headers)
 
         if (incomingMessage.headers["content-type"] === "application/ogg"){
             // counts how many times connection is sucessfull
@@ -64,6 +65,8 @@ let playStream = async (url,message) => {
             playStream(ulr,message)
         },2 *1000,message,url)
         
+    }).on("continue", () => {
+        console.log("continue")
     })
 }
 
@@ -88,6 +91,9 @@ let getConnection = async (message, tryNumber = 0) => {
 }
 
 let tryPlayStream = async (message,url) => {
+
+    
+
     try{
         playStream(url,message)
 
@@ -109,6 +115,8 @@ let disconnectStream = (message) => {
     }
 }
 
+
+
 let messageCommandEquals = (command,mesageText) => {
     return mesageText.startsWith(prefix + " " + command)
 }
@@ -118,6 +126,7 @@ client.on('message', message => {
         handleCommand(message)
     }
 });
+
 
 let handleCommand = async (message) => {
     mesageText =  message.content
@@ -145,5 +154,4 @@ let handleCommand = async (message) => {
 
 // login
 client.login(process.env.botToken);
-
-//
+//botToken=NzEzMzM2ODE0MTA2MDUwNjgx.Xse9Lw.L_22TQfJchwIN8UL6MYoC2hbm4E
